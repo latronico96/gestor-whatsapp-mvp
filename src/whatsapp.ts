@@ -31,6 +31,14 @@ async function registerOutgoing(
 
 async function send(payload: any) {
   const { token, phoneNumberId } = config();
+  console.log("[Diagnóstico WhatsApp]", {
+    tokenConfigured: !!token,
+    tokenLength: token?.length,
+    tokenStartsWithBearer: token?.startsWith("Bearer "),
+    tokenHasWhitespace: token !== token?.trim(),
+    tokenLast6: token?.slice(-6),
+    phoneNumberIdConfigured: !!phoneNumberId
+  });
 
   const loggedText =
     payload.type === "text"
