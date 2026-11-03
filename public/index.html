@@ -1,0 +1,153 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestor WhatsApp</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 28px;
+      background: #101714;
+      color: #e5eee8;
+      font-family: Arial, sans-serif;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    h1 { font-size: 24px; margin: 0; }
+    .muted { color: #91a49a; font-size: 13px; }
+    .panel {
+      background: #19231e;
+      border: 1px solid #2b3b32;
+      border-radius: 12px;
+      padding: 18px;
+    }
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    input, button {
+      border: 1px solid #35483d;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: #101714;
+      color: white;
+    }
+    input { flex: 1; min-width: 180px; }
+    button { cursor: pointer; background: #246b45; }
+    button:hover { background: #2e8054; }
+    .event {
+      padding: 14px 0;
+      border-bottom: 1px solid #2b3b32;
+    }
+    .event:last-child { border-bottom: 0; }
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .tag {
+      font-size: 11px;
+      border-radius: 20px;
+      padding: 4px 9px;
+      background: #263b30;
+      color: #9ee2b8;
+    }
+    .tag.out { background: #26344a; color: #a9c8ff; }
+    .message { white-space: pre-wrap; line-height: 1.5; }
+    #status { margin-bottom: 14px; }
+    @media (max-width: 600px) {
+      body { padding: 16px; }
+      h1 { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Gestor WhatsApp</h1>
+      <div class="muted">Historial de conversaciones</div>
+    </div>
+    <button onclick="loadLogs()">Actualizar</button>
+  </header>
+
+  <section class="panel">
+    <div class="toolbar">
+      <input id="phone" placeholder="Filtrar por teléfono..." />
+    </div>
+    <div id="status" class="muted">Cargando historial...</div>
+    <div id="logs"></div>
+  </section>
+
+  <script>
+    async function loadLogs() {
+      const status = document.getElementById("status");
+      const container = document.getElementById("logs");
+      const filter = document.getElementById("phone").value.trim();
+
+      try {
+        const response = await fetch("/api/logs");
+        if (!response.ok) throw new Error("No se pudo cargar el historial");
+
+        const events = await response.json();
+        const filtered = events.filter(event =>
+          !filter || (event.phone || "").includes(filter)
+        ).reverse();
+
+        status.textContent = `${filtered.length} eventos registrados`;
+
+        container.innerHTML = "";
+
+        if (!filtered.length) {
+          container.textContent = "Todavía no hay actividad registrada.";
+          return;
+        }
+
+        for (const event of filtered) {
+          const item = document.createElement("div");
+          item.className = "event";
+
+          const meta = document.createElement("div");
+          meta.className = "meta";
+
+          const left = document.createElement("strong");
+          left.textContent = event.phone || "Sin teléfono";
+
+          const right = document.createElement("span");
+          right.className = "tag " + (event.direction === "out" ? "out" : "");
+          right.textContent = event.direction === "out" ? "BOT → CLIENTE" : "CLIENTE → BOT";
+
+          const time = document.createElement("div");
+          time.className = "muted";
+          time.textContent = new Date(event.timestamp).toLocaleString("es-AR");
+
+          const message = document.createElement("div");
+          message.className = "message";
+          message.textContent = event.text || "(Mensaje sin texto)";
+
+          meta.append(left, right);
+          item.append(meta, time, message);
+          container.append(item);
+        }
+      } catch (error) {
+        status.textContent = error.message;
+      }
+    }
+
+    document.getElementById("phone").addEventListener("input", loadLogs);
+    loadLogs();
+    setInterval(loadLogs, 5000);
+  </script>
+</body>
+</html>

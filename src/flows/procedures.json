@@ -1,0 +1,101 @@
+{
+  "welcome": "¡Hola! ¿Cómo estás? 👋 Soy el asistente del gestor. Te voy a hacer unas preguntas para conocer tu situación y poder ayudarte.",
+  "menuQuestion": "¿Qué trámite necesitás realizar?",
+  "procedures": [
+    {
+      "id": "habilitacion",
+      "title": "Habilitación",
+      "description": "Iniciar una habilitación para un local.",
+      "steps": [
+        {
+          "id": "tipo_comercio",
+          "type": "buttons",
+          "question": "¿Qué tipo de comercio tenés?",
+          "saveAs": "Tipo de comercio",
+          "options": [
+            {
+              "id": "local",
+              "title": "Local comercial"
+            },
+            {
+              "id": "gastronomia",
+              "title": "Gastronomía"
+            },
+            {
+              "id": "servicios",
+              "title": "Servicios"
+            }
+          ]
+        },
+        {
+          "id": "local_funcionando",
+          "type": "buttons",
+          "question": "¿El comercio ya está funcionando?",
+          "saveAs": "¿Ya está funcionando?",
+          "options": [
+            {
+              "id": "si",
+              "title": "Sí"
+            },
+            {
+              "id": "no",
+              "title": "No"
+            }
+          ]
+        },
+        {
+          "id": "direccion",
+          "type": "text",
+          "question": "¿En qué dirección está el establecimiento? (Calle y altura, localidad)",
+          "saveAs": "Dirección"
+        },
+        {
+          "id": "nombre",
+          "type": "text",
+          "question": "¿A nombre de quién se realizaría el trámite?",
+          "saveAs": "Titular"
+        }
+      ]
+    },
+    {
+      "id": "renovacion",
+      "title": "Renovación de habilitación",
+      "description": "Consultar por la renovación de una habilitación existente.",
+      "steps": [
+        {
+          "id": "titular",
+          "type": "text",
+          "question": "¿A nombre de quién está la habilitación actual?",
+          "saveAs": "Titular de la habilitación"
+        },
+        {
+          "id": "direccion",
+          "type": "text",
+          "question": "¿Cuál es la dirección del comercio?",
+          "saveAs": "Dirección"
+        },
+        {
+          "id": "vencimiento",
+          "type": "buttons",
+          "question": "¿La habilitación está vencida?",
+          "saveAs": "¿Está vencida?",
+          "options": [
+            {
+              "id": "si",
+              "title": "Sí"
+            },
+            {
+              "id": "no",
+              "title": "No"
+            },
+            {
+              "id": "no_se",
+              "title": "No lo sé"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "finalMessage": "¡Listo! Recibimos tu consulta. El gestor revisará la información y se pondrá en contacto con vos a la brevedad para brindarte más detalles. ¡Gracias!"
+}
