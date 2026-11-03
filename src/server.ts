@@ -92,43 +92,43 @@ app.get("/webhook", (req, res) => {
 });
 
 // RECEPCIÓN DE MENSAJES REALES
-app.post("/webhook", async (req, res) => {
-  // Respondemos rápido a Meta.
-  res.sendStatus(200);
 
+app.post("/webhook", async (req, res) => {
   try {
     const value = req.body?.entry?.[0]?.changes?.[0]?.value;
     const messages = value?.messages ?? [];
 
     for (const message of messages) {
-      const phone = message.from as string | undefined;
-
+      const phone = message.from as string;
       const text = message.text?.body as string | undefined;
-      const interactive = message.interactive;
 
+      const interactive = message.interactive;
       const buttonReply = interactive?.button_reply;
       const listReply = interactive?.list_reply;
 
       const replyId = buttonReply?.id ?? listReply?.id;
       const replyTitle = buttonReply?.title ?? listReply?.title;
-
       const body = text ?? replyTitle ?? "";
 
-      if (!phone || !body) continue;
+      if (phone && body) {
+        await logEvent({
+          phone,
+          direction: "in",
+          type: message.type ?? "text",
+          text: body
+        });
 
-      await logEvent({
-        phone,
-        direction: "in",
-        type: message.type ?? "text",
-        text: body
-      });
-
-      await handleIncoming(phone, body, replyId);
+        await handleIncoming(phone, body, replyId);
+      }
     }
+
+    res.sendStatus(200);
   } catch (error) {
     console.error("Error procesando webhook:", error);
+    res.sendStatus(500);
   }
 });
+
 
 const port = Number(process.env.PORT ?? 3000);
 
