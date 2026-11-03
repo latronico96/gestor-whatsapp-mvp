@@ -12,27 +12,36 @@ function config() {
   };
 }
 
+async function registerOutgoing(
+  phone: string,
+  type: string,
+  text: string
+) {
+  try {
+    await logEvent({
+      phone,
+      direction: "out",
+      type,
+      text
+    });
+  } catch (error) {
+    console.error("Error registrando mensaje saliente:", error);
+  }
+}
+
 async function send(payload: any) {
   const { token, phoneNumberId } = config();
 
-  // Extraemos el texto para el historial.
   const loggedText =
     payload.type === "text"
       ? payload.text?.body ?? ""
       : payload.interactive?.body?.text ?? "";
 
-  // Si no hay credenciales, simulamos el envío.
   if (!token || !phoneNumberId) {
     console.log("[WhatsApp simulado]");
     console.dir(payload, { depth: null });
 
-    await logEvent({
-      phone: payload.to,
-      direction: "out",
-      type: payload.type,
-      text: loggedText
-    });
-
+    await registerOutgoing(payload.to, payload.type, loggedText);
     return;
   }
 
@@ -54,13 +63,7 @@ async function send(payload: any) {
     throw new Error(`WhatsApp API ${response.status}: ${responseBody}`);
   }
 
-  // Registramos solamente si Meta aceptó el envío.
-  await logEvent({
-    phone: payload.to,
-    direction: "out",
-    type: payload.type,
-    text: loggedText
-  });
+  await registerOutgoing(payload.to, payload.type, loggedText);
 }
 
 export async function sendText(to: string, body: string) {
