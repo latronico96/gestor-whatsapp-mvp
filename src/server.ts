@@ -12,6 +12,8 @@ app.use(express.json());
 app.get("/", (_req, res) => {
   res.sendFile(path.resolve(process.cwd(), "public", "index.html"));
 });
+app.use(express.static(path.resolve(process.cwd(), "public")));
+
 
 // HISTORIAL DE CONVERSACIONES
 app.get("/api/logs", async (_req, res) => {
